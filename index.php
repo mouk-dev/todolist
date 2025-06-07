@@ -1,10 +1,19 @@
+<?php
+	// Génère la date UTC actuelle au format ISO 8601
+	$serverUtcTimestamp = gmdate('Y-m-d\TH:i:s\Z');
+?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>TO DO LIST</title>
 		<link rel="stylesheet" href="style.css" />
+		<script>
+			// Variable JS globale accessible dans ton script main.js
+			const serverTimestamp = "<?php echo $serverUtcTimestamp; ?>";
+		</script>
 		<script src="main.js" defer></script>
 	</head>
 	<body>
@@ -26,7 +35,7 @@
 			<div class="task-container" id="tasks-list">
 				<template id="task-layout">
 					<form class="task-form">
-						<div class="form-group" id="group-box">
+						<div class="form-group group-box">
 							<input
 								type="checkbox"
 								name="task"
@@ -59,7 +68,7 @@
 			<div class="depense-container" id="depenses-list">
 				<template id="depense-layout">
 					<form class="depense-form">
-						<div class="form-group" id="group-box">
+						<div class="form-group group-box">
 							<input
 								type="checkbox"
 								name="depense"
