@@ -10,114 +10,70 @@ let newDepenseBtn = document.getElementById("new-depense-btn");
 let totalDepensesBox = document.getElementById("total-depenses-box");
 let clickNumber = 0;
 
-let stockTasks = "";
-let stockDepenses = "";
+// CLONAGE
 
-let cloneTaskLayout = function () {
+function cloneTaskLayout() {
 	let taskLayoutContent = taskLayout.content;
 	let taskLayoutClone = taskLayoutContent.cloneNode(true);
 	tasksList.append(taskLayoutClone);
+	saveTasks();
+}
 
-	let textTags = tasksList.innerHTML;
-	stockTasks += textTags;
-	console.log(stockTasks);
-
-	localStorage.setItem("saveTasks", stockTasks);
-
-	return tasksList;
-};
-
-let cloneDepenseLayout = function () {
+function cloneDepenseLayout() {
 	let depenseLayoutContent = depenseLayout.content;
 	let depenseLayoutClone = depenseLayoutContent.cloneNode(true);
 	depensesList.append(depenseLayoutClone);
+	saveDepenses();
+	updateTotalDepenses();
+}
 
-	let textTags = depensesList.innerHTML;
-	stockDepenses += textTags;
-	console.log(stockDepenses);
+// CONTRÔLE (désactivé au départ, mais inutile ici avec édition toggle)
+// Tu peux supprimer les fonctions controleTaskLayout / controleDepenseLayout si plus utilisées
 
-	localStorage.setItem("saveDepenses", stockDepenses);
+// NOUVELLE TÂCHE / DÉPENSE
 
-	return depensesList;
-};
-
-let controleTaskLayout = function () {
-	let fields = document.querySelectorAll(".task-input");
-	let newTaskBtn = document.getElementById("new-task-btn");
-
-	fields.forEach((input, index) => {
-		fields[index].setAttribute("id", `item-${index}`);
-		fieldState = true;
-		newTaskBtn.addEventListener("click", (e) => {
-			if (fieldState === true) {
-				fields[index].disabled = fieldState;
-				console.log("Désactivé");
-			}
-		});
-		return fields[index];
-	});
-};
-
-let controleDepenseLayout = function () {
-	let fields = document.querySelectorAll(".depense-input");
-	let newDepenseBtn = document.getElementById("new-depense-btn");
-
-	fields.forEach((input, index) => {
-		fields[index].setAttribute("id", `item-${index}`);
-		fieldState = true;
-		newDepenseBtn.addEventListener("click", (e) => {
-			if (fieldState === true) {
-				fields[index].disabled = fieldState;
-				console.log("Désactivé");
-			}
-		});
-		return fields[index];
-	});
-};
-
-let newCloneTaskLayout = function () {
+function newCloneTaskLayout() {
 	cloneTaskLayout();
-	controleTaskLayout();
-};
+}
 
-let newCloneDepenseLayout = function () {
+function newCloneDepenseLayout() {
 	cloneDepenseLayout();
-	controleDepenseLayout();
 	clickNumber++;
 	if (clickNumber > 0) {
 		totalDepensesBox.style.display = "block";
-		console.log(clickNumber);
 	}
-};
+}
 
-newTaskBtn.addEventListener("click", newCloneTaskLayout);
-newDepenseBtn.addEventListener("click", newCloneDepenseLayout);
+// MASQUER LE TOTAL AU DÉPART
 
 (function checkDepenseExisting() {
 	if (clickNumber === 0) {
 		totalDepensesBox.style.display = "none";
-		console.log(clickNumber);
 	}
 })();
 
-let showTasksSaved = function () {
-	if (tasksList.innerHTML === null) {
-		console.log("vide");
-	}
-	tasksList.innerHTML += localStorage.getItem("saveTasks");
-	console.log(tasksList);
-};
+// SAUVEGARDE
 
-let showDepensesSaved = function () {
-	depensesList.innerHTML += localStorage.getItem("saveDepenses");
+function saveTasks() {
+	localStorage.setItem("saveTasks", tasksList.innerHTML);
+}
 
-	console.log(depensesList);
-};
+function saveDepenses() {
+	localStorage.setItem("saveDepenses", depensesList.innerHTML);
+}
 
-document.addEventListener("DOMContentLoaded", function () {
-	showTasksSaved();
-	showDepensesSaved();
-});
+// RESTAURATION
+
+function showTasksSaved() {
+	tasksList.innerHTML += localStorage.getItem("saveTasks") || "";
+}
+
+function showDepensesSaved() {
+	depensesList.innerHTML += localStorage.getItem("saveDepenses") || "";
+	updateTotalDepenses();
+}
+
+// CALCUL TOTAL
 
 function updateTotalDepenses() {
 	let total = 0;
@@ -129,10 +85,66 @@ function updateTotalDepenses() {
 	});
 	totalDepensesBox.textContent = total + " F";
 }
-updateTotalDepenses();
+
+// GÉRER LES ÉVÉNEMENTS
+
+document.addEventListener("DOMContentLoaded", function () {
+	showTasksSaved();
+	showDepensesSaved();
+});
+
+newTaskBtn.addEventListener("click", newCloneTaskLayout);
+newDepenseBtn.addEventListener("click", newCloneDepenseLayout);
+
+// DÉTECTION DES CHANGEMENTS DANS LES DÉPENSES POUR MÀJ AUTO DU TOTAL
 
 depensesList.addEventListener("input", function (e) {
 	if (e.target.classList.contains("depense-describe")) {
+		updateTotalDepenses();
+		saveDepenses();
+	}
+});
+
+// SUPPRESSION & ÉDITION
+
+document.addEventListener("click", function (e) {
+	// Supprimer tâche
+	if (e.target.classList.contains("delete-task-btn")) {
+		e.preventDefault();
+		let taskForm = e.target.closest(".task-form");
+		taskForm.remove();
+		saveTasks();
+	}
+
+	// Supprimer dépense
+	if (e.target.classList.contains("delete-depense-btn")) {
+		e.preventDefault();
+		let depenseForm = e.target.closest(".depense-form");
+		depenseForm.remove();
+		saveDepenses();
+		updateTotalDepenses();
+	}
+
+	// Éditer tâche
+	if (e.target.classList.contains("update-task-btn")) {
+		e.preventDefault();
+		let taskForm = e.target.closest(".task-form");
+		let inputs = taskForm.querySelectorAll(".task-input");
+		inputs.forEach((input) => {
+			input.disabled = !input.disabled;
+		});
+		saveTasks();
+	}
+
+	// Éditer dépense
+	if (e.target.classList.contains("update-depense-btn")) {
+		e.preventDefault();
+		let depenseForm = e.target.closest(".depense-form");
+		let inputs = depenseForm.querySelectorAll(".depense-input");
+		inputs.forEach((input) => {
+			input.disabled = !input.disabled;
+		});
+		saveDepenses();
 		updateTotalDepenses();
 	}
 });
