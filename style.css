@@ -25,6 +25,10 @@ body {
 	padding: 1rem;
 }
 
+.app-header > * {
+	margin-right: 1rem;
+}
+
 .task-btn,
 .depense-btn {
 	color: white;
@@ -66,6 +70,11 @@ body {
 	padding: 0.5rem 0.5rem;
 }
 
+input[type="text"],
+input[type="checkbox"] {
+	margin-right: 0.5rem;
+}
+
 .task-describe,
 .depense-describe {
 	width: 60%;
@@ -93,4 +102,91 @@ body {
 	margin-top: 1rem;
 	margin-bottom: 1rem;
 	display: block;
+}
+
+@media (max-width: 600px) {
+	body {
+		font-size: 14px;
+	}
+
+	.app-header {
+		flex-direction: column;
+		gap: 0.5rem;
+		padding: 1rem 0.5rem;
+	}
+
+	.new-task-btn,
+	.new-depense-btn {
+		width: 100%;
+		font-size: 1rem;
+		padding: 0.75rem;
+	}
+
+	.todo-group-title {
+		margin-top: 0.5rem;
+	}
+
+	.task-form,
+	.depense-form {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.form-group {
+		flex-direction: column;
+		align-items: center;
+		width: 100%;
+	}
+
+	.task-check,
+	.depense-check,
+	.task-input,
+	.depense-input {
+		width: 100%;
+		margin-bottom: 0.5rem;
+	}
+
+	.task-describe,
+	.depense-describe {
+		width: 100%;
+	}
+
+	.form-group-btn {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.task-btn,
+	.depense-btn {
+		flex: 1;
+		margin: 0 0.25rem;
+		padding: 0.5rem 0.5rem;
+		font-size: 1rem;
+	}
+
+	.total-depenses {
+		width: 90%;
+		font-size: 1.25rem;
+		padding: 0.75rem;
+		margin: 1rem auto;
+	}
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+	.form-group-btn {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		gap: 1rem;
+		margin-top: 0.5rem;
+		margin-left: 0.5rem;
+	}
+
+	.task-btn,
+	.depense-btn {
+		flex: 1 1 120px;
+		padding: 0.5rem 0.5rem;
+		font-size: 1rem;
+		border-radius: 0.3rem;
+	}
 }

@@ -1,21 +1,29 @@
-// Données en mémoire (tableaux d'objets)
+/**
+ * Data into memory (d'objets table)
+ */
 let tasks = [];
 let depenses = [];
 
-// Sélecteurs DOM
+/**
+ * Selector DOM
+ */
 const tasksList = document.getElementById("tasks-list");
 const depensesList = document.getElementById("depenses-list");
 const totalDepensesBox = document.getElementById("total-depenses-box");
 const newTaskBtn = document.getElementById("new-task-btn");
 const newDepenseBtn = document.getElementById("new-depense-btn");
 
-// Sauvegarde dans localStorage
+/**
+ * Save in localStorage
+ */
 function saveData() {
 	localStorage.setItem("tasks", JSON.stringify(tasks));
 	localStorage.setItem("depenses", JSON.stringify(depenses));
 }
 
-// Chargement depuis localStorage
+/**
+ * Load from localStorage
+ */
 function loadData() {
 	const savedTasks = localStorage.getItem("tasks");
 	const savedDepenses = localStorage.getItem("depenses");
@@ -24,7 +32,12 @@ function loadData() {
 	depenses = savedDepenses ? JSON.parse(savedDepenses) : [];
 }
 
-// Génération HTML d’une tâche
+/**
+ * HTML generation of an task
+ * @param {*} task
+ * @param {*} index
+ * @returns
+ */
 function createTaskElement(task, index) {
 	const form = document.createElement("form");
 	form.className = "task-form";
@@ -43,15 +56,20 @@ function createTaskElement(task, index) {
 			}</textarea>
 		</div>
 		<div class="form-group-btn">
-			<button class="task-btn update-task-btn">Edit task</button>
-			<button class="task-btn delete-task-btn">Remove task</button>
+			<button class="task-btn update-task-btn">Edit</button>
+			<button class="task-btn delete-task-btn">Remove</button>
 		</div>
 	`;
 
 	return form;
 }
 
-// Génération HTML d’une dépense
+/**
+ * HTML generation of an expense
+ * @param {*} depense
+ * @param {*} index
+ * @returns
+ */
 function createDepenseElement(depense, index) {
 	const form = document.createElement("form");
 	form.className = "depense-form";
@@ -70,27 +88,35 @@ function createDepenseElement(depense, index) {
 			}" disabled />
 		</div>
 		<div class="form-group-btn">
-			<button class="depense-btn update-depense-btn">Edit depense</button>
-			<button class="depense-btn delete-depense-btn">Remove depense</button>
+			<button class="depense-btn update-depense-btn">Edit</button>
+			<button class="depense-btn delete-depense-btn">Remove</button>
 		</div>
 	`;
 
 	return form;
 }
 
-// Afficher toutes les tâches et dépenses à partir des données
+/**
+ * Show all tasks and expenses from data
+ */
 function render() {
-	// Clear containers
+	/**
+	 * Clear containers
+	 */
 	tasksList.innerHTML = "";
 	depensesList.innerHTML = "";
 
-	// Tâches
+	/**
+	 * tasks
+	 */
 	tasks.forEach((task, index) => {
 		const taskElem = createTaskElement(task, index);
 		tasksList.appendChild(taskElem);
 	});
 
-	// Dépenses
+	/**
+	 * expenses
+	 */
 	depenses.forEach((depense, index) => {
 		const depenseElem = createDepenseElement(depense, index);
 		depensesList.appendChild(depenseElem);
@@ -99,14 +125,16 @@ function render() {
 	updateTotalDepenses();
 }
 
-// Calcul total dépenses
+/**
+ * Calcul total expenses
+ */
 function updateTotalDepenses() {
 	let total = depenses.reduce((sum, d) => sum + parseFloat(d.amount || 0), 0);
 	totalDepensesBox.textContent = total + " F";
 	totalDepensesBox.style.display = total > 0 ? "block" : "none";
 }
 
-// Ajouter une nouvelle tâche
+// Add a new task
 function addTask() {
 	tasks.push({
 		title: "",
@@ -117,7 +145,9 @@ function addTask() {
 	render();
 }
 
-// Ajouter une nouvelle dépense
+/**
+ * Add a new expense
+ */
 function addDepense() {
 	depenses.push({
 		title: "",
@@ -128,32 +158,44 @@ function addDepense() {
 	render();
 }
 
-// Gestion des clics sur toute la page (délégué)
+/**
+ * Full-page click handling (delegated)
+ */
 document.addEventListener("click", function (e) {
-	// Nouvelle tâche
+	/**
+	 * New task
+	 */
 	if (e.target === newTaskBtn) {
 		e.preventDefault();
 		addTask();
 	}
 
-	// Nouvelle dépense
+	/**
+	 * New expense
+	 */
 	if (e.target === newDepenseBtn) {
 		e.preventDefault();
 		addDepense();
 	}
 
-	// Éditer tâche
+	/**
+	 * Edit task
+	 */
 	if (e.target.classList.contains("update-task-btn")) {
 		e.preventDefault();
 		const form = e.target.closest(".task-form");
 		const index = parseInt(form.dataset.index);
 
-		// Toggle disabled sur inputs
+		/**
+		 * Toggle disabled on inputs
+		 */
 		form.querySelectorAll(".task-input").forEach((input) => {
 			input.disabled = !input.disabled;
 		});
 
-		// Si on vient de désactiver (fin d'édition), on sauvegarde les valeurs dans le tableau
+		/**
+		 * If we have just deactivated (end of editing), we save the values ​​in the table
+		 */
 		if (form.querySelector(".task-title").disabled) {
 			tasks[index].title = form.querySelector(".task-title").value;
 			tasks[index].description =
@@ -164,7 +206,9 @@ document.addEventListener("click", function (e) {
 		}
 	}
 
-	// Éditer dépense
+	/**
+	 * Edit expense
+	 */
 	if (e.target.classList.contains("update-depense-btn")) {
 		e.preventDefault();
 		const form = e.target.closest(".depense-form");
@@ -185,7 +229,9 @@ document.addEventListener("click", function (e) {
 		}
 	}
 
-	// Supprimer tâche
+	/**
+	 * delete task
+	 */
 	if (e.target.classList.contains("delete-task-btn")) {
 		e.preventDefault();
 		const form = e.target.closest(".task-form");
@@ -195,7 +241,9 @@ document.addEventListener("click", function (e) {
 		render();
 	}
 
-	// Supprimer dépense
+	/**
+	 * delete expense
+	 */
 	if (e.target.classList.contains("delete-depense-btn")) {
 		e.preventDefault();
 		const form = e.target.closest(".depense-form");
@@ -206,7 +254,9 @@ document.addEventListener("click", function (e) {
 	}
 });
 
-// Mise à jour dynamique des montants de dépenses pendant la saisie
+/**
+ * Dynamique update data
+ */
 depensesList.addEventListener("input", function (e) {
 	if (e.target.classList.contains("depense-describe")) {
 		const form = e.target.closest(".depense-form");
@@ -218,7 +268,6 @@ depensesList.addEventListener("input", function (e) {
 	}
 });
 
-// Chargement initial
 document.addEventListener("DOMContentLoaded", function () {
 	loadData();
 	render();
