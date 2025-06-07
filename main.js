@@ -1,150 +1,225 @@
-let taskLayout = document.getElementById("task-layout");
-let depenseLayout = document.getElementById("depense-layout");
+// Données en mémoire (tableaux d'objets)
+let tasks = [];
+let depenses = [];
 
-let tasksList = document.getElementById("tasks-list");
-let depensesList = document.getElementById("depenses-list");
+// Sélecteurs DOM
+const tasksList = document.getElementById("tasks-list");
+const depensesList = document.getElementById("depenses-list");
+const totalDepensesBox = document.getElementById("total-depenses-box");
+const newTaskBtn = document.getElementById("new-task-btn");
+const newDepenseBtn = document.getElementById("new-depense-btn");
 
-let newTaskBtn = document.getElementById("new-task-btn");
-let newDepenseBtn = document.getElementById("new-depense-btn");
-
-let totalDepensesBox = document.getElementById("total-depenses-box");
-let clickNumber = 0;
-
-// CLONAGE
-
-function cloneTaskLayout() {
-	let taskLayoutContent = taskLayout.content;
-	let taskLayoutClone = taskLayoutContent.cloneNode(true);
-	tasksList.append(taskLayoutClone);
-	saveTasks();
+// Sauvegarde dans localStorage
+function saveData() {
+	localStorage.setItem("tasks", JSON.stringify(tasks));
+	localStorage.setItem("depenses", JSON.stringify(depenses));
 }
 
-function cloneDepenseLayout() {
-	let depenseLayoutContent = depenseLayout.content;
-	let depenseLayoutClone = depenseLayoutContent.cloneNode(true);
-	depensesList.append(depenseLayoutClone);
-	saveDepenses();
-	updateTotalDepenses();
+// Chargement depuis localStorage
+function loadData() {
+	const savedTasks = localStorage.getItem("tasks");
+	const savedDepenses = localStorage.getItem("depenses");
+
+	tasks = savedTasks ? JSON.parse(savedTasks) : [];
+	depenses = savedDepenses ? JSON.parse(savedDepenses) : [];
 }
 
-// CONTRÔLE (désactivé au départ, mais inutile ici avec édition toggle)
-// Tu peux supprimer les fonctions controleTaskLayout / controleDepenseLayout si plus utilisées
+// Génération HTML d’une tâche
+function createTaskElement(task, index) {
+	const form = document.createElement("form");
+	form.className = "task-form";
+	form.dataset.index = index;
 
-// NOUVELLE TÂCHE / DÉPENSE
+	form.innerHTML = `
+		<div class="form-group" id="group-box">
+			<input type="checkbox" name="task" class="task-check" ${
+				task.completed ? "checked" : ""
+			} />
+			<input type="text" name="task-title" class="task-input task-title" placeholder="Enter your task title." value="${
+				task.title
+			}" disabled />
+			<textarea name="task-description" class="task-input task-describe" placeholder="Describe your task" disabled>${
+				task.description
+			}</textarea>
+		</div>
+		<div class="form-group-btn">
+			<button class="task-btn update-task-btn">Edit task</button>
+			<button class="task-btn delete-task-btn">Remove task</button>
+		</div>
+	`;
 
-function newCloneTaskLayout() {
-	cloneTaskLayout();
+	return form;
 }
 
-function newCloneDepenseLayout() {
-	cloneDepenseLayout();
-	clickNumber++;
-	if (clickNumber > 0) {
-		totalDepensesBox.style.display = "block";
-	}
+// Génération HTML d’une dépense
+function createDepenseElement(depense, index) {
+	const form = document.createElement("form");
+	form.className = "depense-form";
+	form.dataset.index = index;
+
+	form.innerHTML = `
+		<div class="form-group" id="group-box">
+			<input type="checkbox" name="depense" class="depense-check" ${
+				depense.completed ? "checked" : ""
+			} />
+			<input type="text" name="depense-title" class="depense-input depense-title" placeholder="Enter your depense title." value="${
+				depense.title
+			}" disabled />
+			<input type="number" name="depense-description" class="depense-input depense-describe" placeholder="Describe your depense" value="${
+				depense.amount
+			}" disabled />
+		</div>
+		<div class="form-group-btn">
+			<button class="depense-btn update-depense-btn">Edit depense</button>
+			<button class="depense-btn delete-depense-btn">Remove depense</button>
+		</div>
+	`;
+
+	return form;
 }
 
-// MASQUER LE TOTAL AU DÉPART
+// Afficher toutes les tâches et dépenses à partir des données
+function render() {
+	// Clear containers
+	tasksList.innerHTML = "";
+	depensesList.innerHTML = "";
 
-(function checkDepenseExisting() {
-	if (clickNumber === 0) {
-		totalDepensesBox.style.display = "none";
-	}
-})();
-
-// SAUVEGARDE
-
-function saveTasks() {
-	localStorage.setItem("saveTasks", tasksList.innerHTML);
-}
-
-function saveDepenses() {
-	localStorage.setItem("saveDepenses", depensesList.innerHTML);
-}
-
-// RESTAURATION
-
-function showTasksSaved() {
-	tasksList.innerHTML += localStorage.getItem("saveTasks") || "";
-}
-
-function showDepensesSaved() {
-	depensesList.innerHTML += localStorage.getItem("saveDepenses") || "";
-	updateTotalDepenses();
-}
-
-// CALCUL TOTAL
-
-function updateTotalDepenses() {
-	let total = 0;
-	document.querySelectorAll(".depense-describe").forEach((input) => {
-		let value = parseFloat(input.value);
-		if (!isNaN(value)) {
-			total += value;
-		}
+	// Tâches
+	tasks.forEach((task, index) => {
+		const taskElem = createTaskElement(task, index);
+		tasksList.appendChild(taskElem);
 	});
-	totalDepensesBox.textContent = total + " F";
+
+	// Dépenses
+	depenses.forEach((depense, index) => {
+		const depenseElem = createDepenseElement(depense, index);
+		depensesList.appendChild(depenseElem);
+	});
+
+	updateTotalDepenses();
 }
 
-// GÉRER LES ÉVÉNEMENTS
+// Calcul total dépenses
+function updateTotalDepenses() {
+	let total = depenses.reduce((sum, d) => sum + parseFloat(d.amount || 0), 0);
+	totalDepensesBox.textContent = total + " F";
+	totalDepensesBox.style.display = total > 0 ? "block" : "none";
+}
 
-document.addEventListener("DOMContentLoaded", function () {
-	showTasksSaved();
-	showDepensesSaved();
-});
+// Ajouter une nouvelle tâche
+function addTask() {
+	tasks.push({
+		title: "",
+		description: "",
+		completed: false,
+	});
+	saveData();
+	render();
+}
 
-newTaskBtn.addEventListener("click", newCloneTaskLayout);
-newDepenseBtn.addEventListener("click", newCloneDepenseLayout);
+// Ajouter une nouvelle dépense
+function addDepense() {
+	depenses.push({
+		title: "",
+		amount: 0,
+		completed: false,
+	});
+	saveData();
+	render();
+}
 
-// DÉTECTION DES CHANGEMENTS DANS LES DÉPENSES POUR MÀJ AUTO DU TOTAL
-
-depensesList.addEventListener("input", function (e) {
-	if (e.target.classList.contains("depense-describe")) {
-		updateTotalDepenses();
-		saveDepenses();
-	}
-});
-
-// SUPPRESSION & ÉDITION
-
+// Gestion des clics sur toute la page (délégué)
 document.addEventListener("click", function (e) {
-	// Supprimer tâche
-	if (e.target.classList.contains("delete-task-btn")) {
+	// Nouvelle tâche
+	if (e.target === newTaskBtn) {
 		e.preventDefault();
-		let taskForm = e.target.closest(".task-form");
-		taskForm.remove();
-		saveTasks();
+		addTask();
 	}
 
-	// Supprimer dépense
-	if (e.target.classList.contains("delete-depense-btn")) {
+	// Nouvelle dépense
+	if (e.target === newDepenseBtn) {
 		e.preventDefault();
-		let depenseForm = e.target.closest(".depense-form");
-		depenseForm.remove();
-		saveDepenses();
-		updateTotalDepenses();
+		addDepense();
 	}
 
 	// Éditer tâche
 	if (e.target.classList.contains("update-task-btn")) {
 		e.preventDefault();
-		let taskForm = e.target.closest(".task-form");
-		let inputs = taskForm.querySelectorAll(".task-input");
-		inputs.forEach((input) => {
+		const form = e.target.closest(".task-form");
+		const index = parseInt(form.dataset.index);
+
+		// Toggle disabled sur inputs
+		form.querySelectorAll(".task-input").forEach((input) => {
 			input.disabled = !input.disabled;
 		});
-		saveTasks();
+
+		// Si on vient de désactiver (fin d'édition), on sauvegarde les valeurs dans le tableau
+		if (form.querySelector(".task-title").disabled) {
+			tasks[index].title = form.querySelector(".task-title").value;
+			tasks[index].description =
+				form.querySelector(".task-describe").value;
+			tasks[index].completed = form.querySelector(".task-check").checked;
+			saveData();
+			render();
+		}
 	}
 
 	// Éditer dépense
 	if (e.target.classList.contains("update-depense-btn")) {
 		e.preventDefault();
-		let depenseForm = e.target.closest(".depense-form");
-		let inputs = depenseForm.querySelectorAll(".depense-input");
-		inputs.forEach((input) => {
+		const form = e.target.closest(".depense-form");
+		const index = parseInt(form.dataset.index);
+
+		form.querySelectorAll(".depense-input").forEach((input) => {
 			input.disabled = !input.disabled;
 		});
-		saveDepenses();
+
+		if (form.querySelector(".depense-title").disabled) {
+			depenses[index].title = form.querySelector(".depense-title").value;
+			depenses[index].amount =
+				parseFloat(form.querySelector(".depense-describe").value) || 0;
+			depenses[index].completed =
+				form.querySelector(".depense-check").checked;
+			saveData();
+			render();
+		}
+	}
+
+	// Supprimer tâche
+	if (e.target.classList.contains("delete-task-btn")) {
+		e.preventDefault();
+		const form = e.target.closest(".task-form");
+		const index = parseInt(form.dataset.index);
+		tasks.splice(index, 1);
+		saveData();
+		render();
+	}
+
+	// Supprimer dépense
+	if (e.target.classList.contains("delete-depense-btn")) {
+		e.preventDefault();
+		const form = e.target.closest(".depense-form");
+		const index = parseInt(form.dataset.index);
+		depenses.splice(index, 1);
+		saveData();
+		render();
+	}
+});
+
+// Mise à jour dynamique des montants de dépenses pendant la saisie
+depensesList.addEventListener("input", function (e) {
+	if (e.target.classList.contains("depense-describe")) {
+		const form = e.target.closest(".depense-form");
+		const index = parseInt(form.dataset.index);
+
+		depenses[index].amount = parseFloat(e.target.value) || 0;
+		saveData();
 		updateTotalDepenses();
 	}
+});
+
+// Chargement initial
+document.addEventListener("DOMContentLoaded", function () {
+	loadData();
+	render();
 });
