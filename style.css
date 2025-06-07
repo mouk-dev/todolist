@@ -1,0 +1,96 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: manrope;
+}
+
+.title-app {
+	color: blueviolet;
+	text-align: center;
+	border-top: 1px solid blueviolet;
+	border-bottom: 1px solid blueviolet;
+	margin: 20px 0px;
+}
+
+.app-header {
+	text-align: center;
+	background: blueviolet;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1rem;
+}
+
+.task-btn,
+.depense-btn {
+	color: white;
+	font-size: 1rem;
+	border-radius: 0.2rem;
+	border-style: none;
+	padding: 0.5rem 0.5rem;
+}
+
+.new-task-btn,
+.new-depense-btn {
+	color: blueviolet;
+	background: white;
+}
+
+.todo-group-title {
+	color: white;
+	text-align: center;
+}
+
+.task-form,
+.depense-form {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: 1px solid blueviolet;
+	padding: 1rem 0.5rem;
+}
+
+.form-group {
+	display: flex;
+	justify-content: space-around;
+	width: 725px;
+}
+
+.task-input,
+.depense-input {
+	font-size: 1rem;
+	padding: 0.5rem 0.5rem;
+}
+
+.task-describe,
+.depense-describe {
+	width: 60%;
+}
+
+.update-task-btn,
+.update-depense-btn {
+	background: blueviolet;
+}
+
+.delete-task-btn,
+.delete-depense-btn {
+	background: mediumvioletred;
+}
+
+.total-depenses {
+	color: white;
+	background: blueviolet;
+	font-size: 1.5rem;
+	font-weight: bold;
+	border-radius: 0.5rem;
+	width: max-content;
+	padding: 1rem;
+	margin: 0 auto;
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+	display: block;
+}
