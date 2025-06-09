@@ -43,6 +43,11 @@ function createTaskElement(task, index) {
 	form.className = "task-form";
 	form.dataset.index = index;
 
+	// Marquer visuellement les tâches complétées
+	if (task.completed) {
+		form.classList.add("completed");
+	}
+
 	const createdAtText = task.createdAt
 		? new Date(task.createdAt).toLocaleString()
 		: "";
@@ -80,6 +85,11 @@ function createDepenseElement(depense, index) {
 	form.className = "depense-form";
 	form.dataset.index = index;
 
+	// Marquer visuellement les dépenses complétées
+	if (depense.completed) {
+		form.classList.add("completed");
+	}
+
 	const createdAtText = depense.createdAt
 		? new Date(depense.createdAt).toLocaleString()
 		: "";
@@ -110,23 +120,14 @@ function createDepenseElement(depense, index) {
  * Show all tasks and expenses from data
  */
 function render() {
-	/**
-	 * Clear containers
-	 */
 	tasksList.innerHTML = "";
 	depensesList.innerHTML = "";
 
-	/**
-	 * tasks
-	 */
 	tasks.forEach((task, index) => {
 		const taskElem = createTaskElement(task, index);
 		tasksList.appendChild(taskElem);
 	});
 
-	/**
-	 * expenses
-	 */
 	depenses.forEach((depense, index) => {
 		const depenseElem = createDepenseElement(depense, index);
 		depensesList.appendChild(depenseElem);
@@ -150,21 +151,19 @@ function addTask() {
 		title: "",
 		description: "",
 		completed: false,
-		createdAt: serverTimestamp, // timestamp serveur UTC
+		createdAt: serverTimestamp,
 	});
 	saveData();
 	render();
 }
 
-/**
- * Add a new expense
- */
+// Add a new expense
 function addDepense() {
 	depenses.push({
 		title: "",
 		amount: 0,
 		completed: false,
-		createdAt: serverTimestamp, // timestamp serveur UTC
+		createdAt: serverTimestamp,
 	});
 	saveData();
 	render();
@@ -174,40 +173,28 @@ function addDepense() {
  * Full-page click handling (delegated)
  */
 document.addEventListener("click", function (e) {
-	/**
-	 * New task
-	 */
+	// New task
 	if (e.target === newTaskBtn) {
 		e.preventDefault();
 		addTask();
 	}
 
-	/**
-	 * New expense
-	 */
+	// New expense
 	if (e.target === newDepenseBtn) {
 		e.preventDefault();
 		addDepense();
 	}
 
-	/**
-	 * Edit task
-	 */
+	// Edit task
 	if (e.target.classList.contains("update-task-btn")) {
 		e.preventDefault();
 		const form = e.target.closest(".task-form");
 		const index = parseInt(form.dataset.index);
 
-		/**
-		 * Toggle disabled on inputs
-		 */
 		form.querySelectorAll(".task-input").forEach((input) => {
 			input.disabled = !input.disabled;
 		});
 
-		/**
-		 * If we have just deactivated (end of editing), we save the values ​​in the table
-		 */
 		if (form.querySelector(".task-title").disabled) {
 			tasks[index].title = form.querySelector(".task-title").value;
 			tasks[index].description =
@@ -218,9 +205,7 @@ document.addEventListener("click", function (e) {
 		}
 	}
 
-	/**
-	 * Edit expense
-	 */
+	// Edit expense
 	if (e.target.classList.contains("update-depense-btn")) {
 		e.preventDefault();
 		const form = e.target.closest(".depense-form");
@@ -241,15 +226,11 @@ document.addEventListener("click", function (e) {
 		}
 	}
 
-	/**
-	 * delete task
-	 */
+	// delete task
 	if (e.target.classList.contains("delete-task-btn")) {
 		e.preventDefault();
 		const form = e.target.closest(".task-form");
 		const index = parseInt(form.dataset.index);
-
-		// Confirmation before deletion
 		if (confirm("Are you sure you want to delete this task ?")) {
 			tasks.splice(index, 1);
 			saveData();
@@ -257,20 +238,34 @@ document.addEventListener("click", function (e) {
 		}
 	}
 
-	/**
-	 * delete expense
-	 */
+	// delete expense
 	if (e.target.classList.contains("delete-depense-btn")) {
 		e.preventDefault();
 		const form = e.target.closest(".depense-form");
 		const index = parseInt(form.dataset.index);
-
-		// Confirmation before deletion
 		if (confirm("Do you really want to delete this expense ?")) {
 			depenses.splice(index, 1);
 			saveData();
 			render();
 		}
+	}
+
+	// Check/uncheck task
+	if (e.target.classList.contains("task-check")) {
+		const form = e.target.closest(".task-form");
+		const index = parseInt(form.dataset.index);
+		tasks[index].completed = e.target.checked;
+		form.classList.toggle("completed", e.target.checked);
+		saveData();
+	}
+
+	// Check/uncheck expense
+	if (e.target.classList.contains("depense-check")) {
+		const form = e.target.closest(".depense-form");
+		const index = parseInt(form.dataset.index);
+		depenses[index].completed = e.target.checked;
+		form.classList.toggle("completed", e.target.checked);
+		saveData();
 	}
 });
 

@@ -200,3 +200,8 @@ input[type="checkbox"] {
 	margin-bottom: 0.5rem;
 	user-select: none; /* empêcher la sélection du texte */
 }
+
+.completed {
+	text-decoration: line-through;
+	opacity: 0.6;
+}
